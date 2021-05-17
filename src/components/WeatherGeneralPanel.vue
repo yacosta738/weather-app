@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-primary absolute h-screen w-2/4 top-0 right-0">
+  <div class="bg-primary absolute h-screen w-3/4 top-0 right-0">
     <div class="mx-32 flex flex-col justify-center items-center">
       <div class="flex justify-end w-full">
         <i :class="{'active-grade': celsius, 'faraday-celsius-icon': !celsius}" @click="celsius = true">
