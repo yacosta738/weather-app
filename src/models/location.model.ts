@@ -6,18 +6,22 @@
 // woeid	integer		Where On Earth ID
 // distance	integer	Metres	Only returned on a lattlong search
 export interface ILocation {
-    title: string;
-    location_type: string;
-    latt_long: string;
-    woeid: number;
-    distance?: number;
+  title: string;
+  location_type: string;
+  latt_long: string;
+  woeid: number;
+  distance?: number;
 }
 
 export class Location implements ILocation {
-    constructor(public title: string, public location_type: string, public latt_long: string,
-                public woeid: number, public distance?: number) {
-        this.woeid = this.woeid || 0;
-        this.distance = this.distance || 0;
-    }
-
+  constructor(
+    public title: string,
+    public location_type: string,
+    public latt_long: string,
+    public woeid: number,
+    public distance?: number
+  ) {
+    this.woeid = this.woeid || 0;
+    this.distance = this.distance || 0;
+  }
 }
