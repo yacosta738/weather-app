@@ -66,8 +66,8 @@
           <h3 class="text-tertiary text-3xl my-2 mx-4">Today’s Hightlights </h3>
           <div class="grid grid-cols-2 gap-14 mx-4">
             <div class="hightlights-card">
-              <h4 class="my-5">Wind status</h4>
-              <div class="flex my-5 text-7xl">7
+              <h4 class="my-2">Wind status</h4>
+              <div class="flex my-2 text-7xl">7
                 <div class="text-4xl mt-5">mph</div>
               </div>
               <div class="flex justify-center items-center mt-5">
@@ -83,8 +83,8 @@
               </div>
             </div>
             <div class="hightlights-card">
-              <h4 class="my-5">Humidity</h4>
-              <div class="flex my-5 text-7xl">
+              <h4 class="my-2">Humidity</h4>
+              <div class="flex my-2 text-7xl">
                 84
                 <div class="text-4xl mt-5">%</div>
               </div>
@@ -120,21 +120,21 @@
               </div>
             </div>
             <div class="hightlights-card">
-              <h4 class="my-5">Wind status</h4>
-              <div class="flex my-5 text-7xl">7
+              <h4 class="my-2">Wind status</h4>
+              <div class="flex my-2 text-7xl">7
                 <div class="text-4xl mt-5">mph</div>
               </div>
             </div>
             <div class="hightlights-card">
-              <h4 class="my-5">Wind status</h4>
-              <div class="flex my-5 text-7xl">7
+              <h4 class="my-2">Wind status</h4>
+              <div class="flex my-2 text-7xl">7
                 <div class="text-4xl mt-5">mph</div>
               </div>
             </div>
           </div>
         </div>
       </div>
-        <div class="text-tertiary my-2">created by <a class="text-green-300 hover:scale-75" href="https://www.blastkode.com">yacosta738</a> - devChallenges.io</div>
+        <div class="absolute bottom-0 text-tertiary my-2">created by <a class="text-green-300 hover:scale-75" href="https://www.blastkode.com">yacosta738</a> - devChallenges.io</div>
     </div>
   </div>
 </template>

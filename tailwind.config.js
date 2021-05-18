@@ -8,7 +8,7 @@ module.exports = {
         secondary: "#1E213A",
         tertiary: "#E7E7EB",
         lightest: "#A09FB1",
-        "lightest-min": "#88869D"
+        "lightest-min": "#88869D",
       },
     },
   },

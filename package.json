@@ -9,13 +9,16 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "vue": "^3.0.5",
     "vue-class-component": "v8.0.0-rc.1",
-    "vue-property-decorator": "v10.0.0-rc.3"
+    "vue-property-decorator": "v10.0.0-rc.3",
+    "vuex": "^4.0.0-0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.1.5",
     "@vue/compiler-sfc": "^3.0.5",
+    "@vue/cli-plugin-vuex": "~4.5.0",
     "autoprefixer": "^10.2.5",
     "node-sass": "^6.0.0",
     "postcss": "^8.2.13",

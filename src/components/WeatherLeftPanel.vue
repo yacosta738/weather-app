@@ -1,7 +1,8 @@
 <template>
   <div class="bg-secondary absolute h-screen w-1/4 top-0 left-0">
     <div class="flex justify-between mb-6">
-      <button class="search-location">Search for place</button>
+      <button class="search-location" @click="$store.commit('updateDrawer', true)">Search for place</button>
+      <navigation-drawer></navigation-drawer>
       <i class="location-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="4"/>
@@ -34,8 +35,11 @@
 
 <script lang="ts">
 import {Options, Vue} from "vue-class-component";
+import NavigationDrawer from "./NavigationDrawer.vue";
 
-@Options({})
+@Options({
+  components: {NavigationDrawer}
+})
 export default class WeatherLeftPanel extends Vue {
 }
 </script>
