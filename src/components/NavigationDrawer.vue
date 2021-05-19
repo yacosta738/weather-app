@@ -9,22 +9,22 @@
     </div>
     <div class="flex justify-center items-center mx-12">
       <div class="relative flex w-full flex-wrap items-stretch mb-3">
-  <span
-      class="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 absolute bg-transparent rounded text-base items-center justify-center w-8 pl-3 py-3">
-    <i class="text-lightest">
-      <svg enable-background="new 0 0 1000 1000" version="1.1" viewBox="0 0 1e3 1e3" xml:space="preserve"
-           xmlns="http://www.w3.org/2000/svg" class="fill-current">
-<path
-    d="m932.8 850-201-201c56.4-67.6 90.3-154.5 90.3-249.5 0.1-215.3-174.2-389.5-389.4-389.5-215.3 0-389.5 174.2-389.5 389.5 0 215.2 174.2 389.5 389.5 389.5 61.1 0 119-14.1 170.5-39.1 3 4.7 6.6 9.1 10.7 13.2l203 203c32 32 84 32 116 0 31.9-32.1 31.9-84.1-0.1-116.1zm-807.6-450.5c0-169.8 137.7-307.5 307.5-307.5s307.5 137.7 307.5 307.5-137.8 307.5-307.5 307.5c-169.8 0-307.5-137.7-307.5-307.5z"/>
-</svg>
-    </i>
-  </span>
-        <input type="text" placeholder="Placeholder"
+        <span
+            class="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 absolute bg-transparent rounded text-base items-center justify-center w-8 pl-3 py-3">
+          <i class="text-lightest">
+            <svg enable-background="new 0 0 1000 1000" version="1.1" viewBox="0 0 1e3 1e3" xml:space="preserve"
+                 xmlns="http://www.w3.org/2000/svg" class="fill-current">
+              <path
+                  d="m932.8 850-201-201c56.4-67.6 90.3-154.5 90.3-249.5 0.1-215.3-174.2-389.5-389.4-389.5-215.3 0-389.5 174.2-389.5 389.5 0 215.2 174.2 389.5 389.5 389.5 61.1 0 119-14.1 170.5-39.1 3 4.7 6.6 9.1 10.7 13.2l203 203c32 32 84 32 116 0 31.9-32.1 31.9-84.1-0.1-116.1zm-807.6-450.5c0-169.8 137.7-307.5 307.5-307.5s307.5 137.7 307.5 307.5-137.8 307.5-307.5 307.5c-169.8 0-307.5-137.7-307.5-307.5z"/>
+            </svg>
+          </i>
+        </span>
+        <input type="text" placeholder="Placeholder" v-model="city"
                class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full pl-10"/>
       </div>
       <button
           class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ml-4"
-          type="button" @click="$store.dispatch('getDataByLocation', )">
+          type="button" @click="searchByLocation()">
         Search
       </button>
     </div>
@@ -36,6 +36,11 @@ import {Options, Vue} from "vue-property-decorator";
 
 Options({})
 export default class NavigationDrawer extends Vue {
+  city: string = '';
+searchByLocation(){
+  this.$store.dispatch('getDataByLocation', this.city);
+  this.city = '';
+}
   get drawer() {
     return this.$store.getters.drawer;
   }
@@ -43,18 +48,19 @@ export default class NavigationDrawer extends Vue {
   set drawer(drawer: boolean) {
     this.$store.commit("updateDrawer", drawer);
   }
-  mounted(){
-    document.addEventListener('DOMContentLoaded', () => this.geolocation(),false);
+
+  mounted() {
+    document.addEventListener('DOMContentLoaded', () => this.geolocation(), false);
   }
 
   private geolocation() {
-    if('geolocation' in navigator){
+    if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((position) => {
         console.log('S T A R T   S E A R C H   L O C A T I O N');
-        let latt_long  = position.coords.latitude.toFixed(2)  + "," +position.coords.longitude.toFixed(2);
+        let latt_long = position.coords.latitude.toFixed(2) + "," + position.coords.longitude.toFixed(2);
         this.$store.dispatch("getDataByCoord", latt_long);
       })
-    }else {
+    } else {
       alert(" geolocation IS NOT available")
     }
   }
