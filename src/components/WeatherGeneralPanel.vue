@@ -11,7 +11,7 @@
       </div>
       <div class="flex justify-center items-center my-2 mx-32 w-full">
         <div class="weather-day-card" v-for="weather in consolidatedWeather" :key="weather.id">
-          <h4 class="day">{{ weather.applicable_date }}</h4>
+          <h4 class="day">{{ weatherDate(weather.applicable_date) }}</h4>
           <div class="flex justify-center items-center">
             <img :src="weatherImage(weather)" :alt="weather.weather_state_name"
                  class="object-cover p-2 w-1/2">
@@ -109,10 +109,16 @@ import {Options, Vue} from 'vue-class-component';
 import {WeatherData} from "../models/weather-data.model";
 import {Weather} from "../models/weather.model";
 
-import {celsiusToFahrenheit, weatherStateImage} from "../utilities/util";
+import {celsiusToFahrenheit, isToday, isTomorrow, weatherStateImage} from "../utilities/util";
+import {format} from "date-fns";
 
 @Options({})
 export default class WeatherGeneralPanel extends Vue {
+
+  weatherDate(applicableDate: string | Date){
+    const date = applicableDate? new Date(applicableDate): new Date();
+    return isTomorrow(date)? 'Tomorrow' : format(date, 'E, d MMM');
+  }
   get todayWeather(){
     return this.$store.getters.weatherToday;
   }
@@ -166,7 +172,7 @@ export default class WeatherGeneralPanel extends Vue {
   }
 
   get consolidatedWeather(): Weather {
-    return this.$store.getters.weatherData?.consolidated_weather;
+    return this.$store.getters.weatherData?.consolidated_weather.filter(weather => !isToday(new Date(weather.applicable_date)));
   }
 
   get weather(): WeatherData {
