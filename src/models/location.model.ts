@@ -13,7 +13,7 @@ export interface ILocation {
   distance?: number;
 }
 
-export class Location implements ILocation {
+export class PlaceLocation implements ILocation {
   constructor(
     public title: string,
     public location_type: string,
