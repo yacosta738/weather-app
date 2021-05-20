@@ -9,7 +9,13 @@ const cors_proxy = "https://intense-hollows-87072.herokuapp.com/";
 const api = axios.create({
     baseURL: `${cors_proxy}https://www.metaweather.com/api/location`,
 });
-
+const getLastSearch = (): string[] => {
+    if (!localStorage.getItem("localSearch")) {
+        localStorage.setItem("localSearch", JSON.stringify([]));
+    }
+    const lSearch: string | null = localStorage.getItem("localSearch");
+    return lSearch ? JSON.parse(lSearch): [];
+}
 export default createStore({
     state: {
         drawer: false,
@@ -30,6 +36,7 @@ export default createStore({
             "",
             0
         ),
+        lastSearch: getLastSearch()
     },
     getters: {
         drawer: (state) => state.drawer,
@@ -39,11 +46,13 @@ export default createStore({
         weatherToday: (state) => state.weatherData?.consolidated_weather[0],
         gradeLabel: (state) => (state.celsius ? "℃" : "℉"),
         celsius: (state) => state.celsius,
+        lastSearch: (state) => state.lastSearch?.filter((value: string , index: number) => index <= 10)
     },
     mutations: {
         updateDrawer(state, drawer) {
             state.drawer = drawer;
-        }, updateLoadingLocation(state, loadingLocation) {
+        },
+        updateLoadingLocation(state, loadingLocation) {
             state.loadingLocation = loadingLocation;
         },
         updateCelsius(state, celsius) {
@@ -72,6 +81,15 @@ export default createStore({
                 weatherData.woeid
             );
         },
+        addLastSearch(state, search: string){
+            const isSearchStored = state.lastSearch.find(s => s.toLowerCase() === search.toLowerCase());
+            if(isSearchStored) return;
+            if(state.lastSearch.length >= 9){
+                state.lastSearch.slice(1);
+            }
+            state.lastSearch.push(search);
+            localStorage.setItem("localSearch", JSON.stringify(state.lastSearch));
+        }
     },
     actions: {
         getDataByLocation(context, location: string) {

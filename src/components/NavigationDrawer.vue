@@ -28,6 +28,18 @@
         Search
       </button>
     </div>
+    <div class="flex justify-start mx-12">
+      <ul class="flex flex-col justify-start  text-tertiary list-none w-full">
+        <li v-for="(search, i) in $store.getters.lastSearch" :key="i" class="flex justify-between my-4 text-lg cursor-pointer border-none p-4"
+            :class="{'active-location': $store.getters.location.title.toLowerCase() === search}"
+        @click="city = search;searchByLocation()">
+          {{search}}
+          <i class="text-lightest" v-if="$store.getters.location.title.toLowerCase() === search">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000" class="fill-current"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </i>
+        </li>
+      </ul>
+    </div>
   </nav>
 </template>
 
@@ -37,10 +49,13 @@ import {Options, Vue} from "vue-property-decorator";
 Options({})
 export default class NavigationDrawer extends Vue {
   city: string = '';
-searchByLocation(){
-  this.$store.dispatch('getDataByLocation', this.city);
-  this.city = '';
-}
+
+  searchByLocation() {
+    this.$store.dispatch('getDataByLocation', this.city);
+    this.$store.commit("addLastSearch", this.city);
+    this.city = '';
+  }
+
   get drawer() {
     return this.$store.getters.drawer;
   }
@@ -78,5 +93,10 @@ searchByLocation(){
 
 .navbar-close {
   transform: translateX(-100%);
+}
+.active-location{
+  border: 1px solid #616475;
+  box-sizing: border-box;
+
 }
 </style>
