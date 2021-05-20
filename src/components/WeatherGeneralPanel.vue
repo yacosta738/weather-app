@@ -12,7 +12,7 @@
       <div class="flex justify-center items-center my-2 mx-32 w-full">
         <div class="weather-day-card" v-for="weather in consolidatedWeather" :key="weather.id">
           <h4 class="day">{{ weatherDate(weather.applicable_date) }}</h4>
-          <div class="flex justify-center items-center">
+          <div class="image-wrapper">
             <img :src="weatherImage(weather)" :alt="weather.weather_state_name"
                  class="object-cover p-2 w-1/2">
           </div>
@@ -210,7 +210,9 @@ export default class WeatherGeneralPanel extends Vue {
     line-height: 19px;
     @apply text-center my-4;
   }
-
+.image-wrapper{
+  @apply flex justify-center items-center h-20;
+}
   .morning {
     font-family: Raleway;
     font-style: normal;
