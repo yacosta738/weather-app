@@ -11,7 +11,10 @@
       </div>
       <div class="flex justify-center items-center my-2 mx-2 xl:mx-32 w-full">
         <div class="grid grid-cols-2 lg:grid-cols-5 gap-1">
-          <div class="weather-day-card" v-for="weather in consolidatedWeather" :key="weather.id">
+          <card-skeleton-loader v-if="consolidatedWeather && consolidatedWeather.length === 0"
+                                class="m-1 xl:m-4"
+          v-for="i in 5" :key="i"></card-skeleton-loader>
+          <div v-if="consolidatedWeather && consolidatedWeather.length > 0" class="weather-day-card" v-for="weather in consolidatedWeather" :key="weather.id">
             <h4 class="day">{{ weatherDate(weather.applicable_date) }}</h4>
             <div class="image-wrapper">
               <img :src="weatherImage(weather)" :alt="weather.weather_state_name"
@@ -28,7 +31,9 @@
         <div class="w-full flex flex-col justify-start p-2">
           <h3 class="text-tertiary text-3xl my-2 mx-4">Today’s Hightlights </h3>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 mx-4">
-            <div class="hightlights-card">
+            <card-skeleton-loader v-if="consolidatedWeather && consolidatedWeather.length === 0"
+                                  v-for="i in 4" :key="i"></card-skeleton-loader>
+            <div class="hightlights-card" v-if="consolidatedWeather && consolidatedWeather.length > 0">
               <h4 class="my-2">Wind status</h4>
               <div class="flex my-2 text-2xl md:text-3xl lg:text-7xl">
                 {{ windSpeed }}
@@ -48,7 +53,7 @@
                 {{ windDirection }}
               </div>
             </div>
-            <div class="hightlights-card">
+            <div class="hightlights-card" v-if="consolidatedWeather && consolidatedWeather.length > 0">
               <h4 class="my-2">Humidity</h4>
               <div class="flex my-2 text-2xl md:text-3xl lg:text-7xl">
                 {{ humidity }}
@@ -85,14 +90,14 @@
                 </div>
               </div>
             </div>
-            <div class="hightlights-card">
+            <div class="hightlights-card" v-if="consolidatedWeather && consolidatedWeather.length > 0">
               <h4 class="my-2">Visibility</h4>
               <div class="flex my-2 text-2xl md:text-3xl lg:text-7xl">
                 {{ visibility }}
                 <div class="text-xl md:text-4xl mt-5">miles</div>
               </div>
             </div>
-            <div class="hightlights-card">
+            <div class="hightlights-card" v-if="consolidatedWeather && consolidatedWeather.length > 0">
               <h4 class="my-2">Air Pressure</h4>
               <div class="flex my-2 text-2xl md:text-3xl lg:text-7xl">
                 {{ Math.round(airPressure) }}
@@ -119,8 +124,11 @@ import {Weather} from "../models/weather.model";
 
 import {celsiusToFahrenheit, isToday, isTomorrow, weatherStateImage} from "../utilities/util";
 import {format} from "date-fns";
+import CardSkeletonLoader from "./CardSkeletonLoader.vue";
 
-@Options({})
+@Options({
+  components: {CardSkeletonLoader}
+})
 export default class WeatherGeneralPanel extends Vue {
 
   weatherDate(applicableDate: string | Date) {
@@ -193,10 +201,9 @@ export default class WeatherGeneralPanel extends Vue {
     this.$store.commit("updateCelsius", value);
   }
 
-  get consolidatedWeather(): Weather {
-    return this.$store.getters.weatherData?.consolidated_weather.filter(weather => !isToday(new Date(weather.applicable_date)));
+  get consolidatedWeather(): Weather[] {
+    return this.$store.getters.weatherData?.consolidated_weather?.filter((weather: Weather, index: number) => index>0);
   }
-
   get weather(): WeatherData {
     return this.$store.getters.weatherData;
   }
@@ -205,7 +212,7 @@ export default class WeatherGeneralPanel extends Vue {
     return Math.round(this.$store.getters.celsius ? temp : celsiusToFahrenheit(temp));
   }
 
-  weatherImage(weather): string {
+  weatherImage(weather: Weather): string {
     return weatherStateImage(weather);
   }
 }

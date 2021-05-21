@@ -24,13 +24,16 @@ module.exports = {
         315: "315deg",
       },
       fontSize: {
-        '10xl': ['144px', {
-        fontFamily: 'Raleway',
-        fontStyle: 'normal',
-        fontWeight: '500',
-        lineHeight: '169px'
-        }],
-      }
+        "10xl": [
+          "144px",
+          {
+            fontFamily: "Raleway",
+            fontStyle: "normal",
+            fontWeight: "500",
+            lineHeight: "169px",
+          },
+        ],
+      },
     },
   },
   variants: {
