@@ -128,7 +128,17 @@ export default createStore({
                     context.commit("updateWeatherData", response.data);
                 })
                 .catch((error) => console.log(error));
-        },
+        }, geolocation(context){
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    console.log('S T A R T   S E A R C H   L O C A T I O N');
+                    let latt_long = position.coords.latitude.toFixed(2) + "," + position.coords.longitude.toFixed(2);
+                    context.dispatch("getDataByCoord", latt_long);
+                })
+            } else {
+                alert(" geolocation IS NOT available")
+            }
+        }
     },
     modules: {},
 });

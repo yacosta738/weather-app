@@ -1,9 +1,9 @@
 <template>
-  <div class="bg-secondary absolute h-screen w-1/4 top-0 left-0">
-    <div class="flex justify-between mb-6">
+  <div class="bg-secondary lg:absolute h-screen lg:w-1/4 lg:top-0 lg:left-0">
+    <div class="flex justify-between mb-2 md:mb-6">
       <button class="search-location" @click="$store.commit('updateDrawer', true)">Search for place</button>
       <navigation-drawer></navigation-drawer>
-      <i class="location-icon">
+      <i class="location-icon" @click="$store.dispatch('geolocation')">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="4"/>
           <path
@@ -18,8 +18,8 @@
     <div class="flex justify-center items-center">
       <div class="temperature">{{ temperature }} <p>{{ $store.getters.gradeLabel }}</p></div>
     </div>
-    <div class="flex justify-center items-center text-lightest text-4xl mt-20">{{ weatherStateName }}</div>
-    <div class="flex flex-col justify-center items-center text-lightest-min mt-20">
+    <div class="flex justify-center items-center text-lightest text-xl sm:text-4xl mt-5 md:mt-20">{{ weatherStateName }}</div>
+    <div class="flex flex-col justify-center items-center text-lightest-min mt-5 md:mt-20">
       <div class="flex justify-center items-center">
         <span class="mx-4">Today</span> • <span class="mx-4">{{ weatherDate }}</span>
       </div>
@@ -114,15 +114,10 @@ export default class WeatherLeftPanel extends Vue {
 }
 
 .temperature {
-  font-family: Raleway;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 144px;
-  line-height: 169px;
   color: #E7E7EB;
-  @apply flex justify-center items-center;
+  @apply flex justify-center items-center text-9xl md:text-10xl;
   p {
-    font-family: Raleway;
+    font-family: Raleway,sans-serif;
     font-size: 48px;
     font-style: normal;
     font-weight: 500;
