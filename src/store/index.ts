@@ -102,7 +102,6 @@ export default createStore({
         .get(`/search/?query=${location}`)
         .then((response) => {
           console.log("S E A R C H   B Y   L O C A T I O N");
-          console.log(location);
           context.commit("updateLocation", response.data[0]);
           context
             .dispatch("getDataByWoeid", context.getters.location.woeid)
