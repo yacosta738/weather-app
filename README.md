@@ -1,6 +1,6 @@
 # Vue 3 + Typescript + Vite
 
-A weather app using an [API](https://www.metaweather.com/api/). Made with [Vue3](https://v3.vuejs.org/) and [Tailwindcss](https://tailwindcss.com/)
+A weather app using an [Metaweather API](https://www.metaweather.com/api/). Made with [Vue3](https://v3.vuejs.org/) and [Tailwindcss](https://tailwindcss.com/)
 
 ![screenshot](screenshots/weather-app.png)
 
