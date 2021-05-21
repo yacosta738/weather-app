@@ -1,8 +1,8 @@
 # Vue 3 + Typescript + Vite
 
-Application to search for music using the [ITunes Api](https://itunes.apple.com/). Made with [Vue3](https://v3.vuejs.org/) and [Tailwindcss](https://tailwindcss.com/)
+A weather app using an [API](https://www.metaweather.com/api/). Made with [Vue3](https://v3.vuejs.org/) and [Tailwindcss](https://tailwindcss.com/)
 
-![screenshot](screenshots/ITunes_Desktop_movil.png)
+![screenshot](screenshots/weather-app.png)
 
 ## Recommended IDE Setup
 

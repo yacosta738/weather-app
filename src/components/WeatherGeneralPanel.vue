@@ -225,7 +225,7 @@ export default class WeatherGeneralPanel extends Vue {
 .weather-day-card {
   @apply bg-secondary text-tertiary p-2 m-1 xl:m-4;
   .day {
-    font-family: Raleway;
+    font-family: Raleway, sans-serif;
     font-style: normal;
     font-weight: 500;
     font-size: 16px;
@@ -238,7 +238,7 @@ export default class WeatherGeneralPanel extends Vue {
   }
 
   .morning {
-    font-family: Raleway;
+    font-family: Raleway, sans-serif;
     font-style: normal;
     font-weight: 500;
     font-size: 16px;
@@ -247,7 +247,7 @@ export default class WeatherGeneralPanel extends Vue {
   }
 
   .evening {
-    font-family: Raleway;
+    font-family: Raleway, sans-serif;
     font-style: normal;
     font-weight: 500;
     font-size: 16px;

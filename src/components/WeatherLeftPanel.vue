@@ -117,7 +117,7 @@ export default class WeatherLeftPanel extends Vue {
   color: #E7E7EB;
   @apply flex justify-center items-center text-9xl md:text-10xl;
   p {
-    font-family: Raleway;
+    font-family: Raleway,sans-serif;
     font-size: 48px;
     font-style: normal;
     font-weight: 500;
