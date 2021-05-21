@@ -44,7 +44,7 @@ export default createStore({
     loadingLocation: (state) => state.loadingLocation,
     location: (state) => state.location,
     weatherData: (state) => state.weatherData,
-    weatherToday: (state) => state.weatherData?.consolidated_weather?.filter(weather => isToday(new Date(weather?.applicable_date))),
+    weatherToday: (state) => state.weatherData?.consolidated_weather[0],
     gradeLabel: (state) => (state.celsius ? "℃" : "℉"),
     celsius: (state) => state.celsius,
     lastSearch: (state) =>
