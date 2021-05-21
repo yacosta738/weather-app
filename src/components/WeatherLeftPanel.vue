@@ -13,7 +13,7 @@
     </div>
     <div class="banner-wrapper">
       <div class="banner"></div>
-      <img :src="weatherImage()" :alt="weatherStateName">
+      <img v-lazy="{ src: weatherImage() }" :alt="weatherStateName">
     </div>
     <div class="flex justify-center items-center">
       <div class="temperature">{{ temperature }} <p>{{ $store.getters.gradeLabel }}</p></div>
@@ -59,7 +59,7 @@ export default class WeatherLeftPanel extends Vue {
   }
 
   get temperature() {
-    const temp = this.todayWeather?.the_temp;
+    const temp = this.todayWeather?.the_temp? this.todayWeather?.the_temp: 0;
     return Math.round(this.$store.getters.celsius ? temp : celsiusToFahrenheit(temp));
   }
 
