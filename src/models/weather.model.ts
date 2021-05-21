@@ -65,7 +65,7 @@ export class Weather implements IWeather {
     return json
       ? new Weather(
           json.air_pressure,
-          json.applicable_date,
+          json.applicable_date.replace('-', '/'),
           json.created,
           json.humidity,
           json.id,
