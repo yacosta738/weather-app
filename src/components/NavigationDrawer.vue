@@ -69,15 +69,7 @@ export default class NavigationDrawer extends Vue {
   }
 
   private geolocation() {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        console.log('S T A R T   S E A R C H   L O C A T I O N');
-        let latt_long = position.coords.latitude.toFixed(2) + "," + position.coords.longitude.toFixed(2);
-        this.$store.dispatch("getDataByCoord", latt_long);
-      })
-    } else {
-      alert(" geolocation IS NOT available")
-    }
+        this.$store.dispatch("geolocation");
   }
 }
 </script>

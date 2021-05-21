@@ -1,41 +1,47 @@
 <template>
-  <div class="bg-primary absolute h-screen w-3/4 top-0 right-0">
-    <div class="mx-32 flex flex-col justify-center items-center">
-      <div class="flex justify-end w-full">
-        <i :class="{'active-grade': celsius, 'faraday-celsius-icon': !celsius}" @click="celsius = true">
+  <div class="bg-primary lg:absolute lg:h-screen lg:w-3/4 lg:top-0 lg:right-0">
+    <div class="mx-2 xl:mx-32 flex flex-col justify-center items-center">
+      <div class="flex justify-center md:justify-end w-full">
+        <i :class="{'active-degree': celsius, 'faraday-celsius-icon': !celsius}" @click="celsius = true">
           <span class="px-1.5">℃</span>
         </i>
-        <i :class="{'active-grade': !celsius, 'faraday-celsius-icon': celsius}" @click="celsius = false">
+        <i :class="{'active-degree': !celsius, 'faraday-celsius-icon': celsius}" @click="celsius = false">
           <span class="px-1.5">℉</span>
         </i>
       </div>
-      <div class="flex justify-center items-center my-2 mx-32 w-full">
-        <div class="weather-day-card" v-for="weather in consolidatedWeather" :key="weather.id">
-          <h4 class="day">{{ weatherDate(weather.applicable_date) }}</h4>
-          <div class="image-wrapper">
-            <img :src="weatherImage(weather)" :alt="weather.weather_state_name"
-                 class="object-cover p-2 w-1/2">
-          </div>
-          <div class="flex justify-around my-4 mx-2">
-            <span class="morning">{{ temperature(weather.max_temp) }}ªC</span>
-            <span class="evening">{{ temperature(weather.min_temp) }}ªC</span>
+      <div class="flex justify-center items-center my-2 mx-2 xl:mx-32 w-full">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-1">
+          <div class="weather-day-card" v-for="weather in consolidatedWeather" :key="weather.id">
+            <h4 class="day">{{ weatherDate(weather.applicable_date) }}</h4>
+            <div class="image-wrapper">
+              <img :src="weatherImage(weather)" :alt="weather.weather_state_name"
+                   class="object-cover p-2 w-1/2">
+            </div>
+            <div class="flex justify-around my-4 mx-2">
+              <span class="morning">{{ temperature(weather.max_temp) }}ªC</span>
+              <span class="evening">{{ temperature(weather.min_temp) }}ªC</span>
+            </div>
           </div>
         </div>
       </div>
-      <div class="flex justify-start mx-32 w-full">
+      <div class="flex justify-start mx-2 xl:mx-32 w-full">
         <div class="w-full flex flex-col justify-start p-2">
           <h3 class="text-tertiary text-3xl my-2 mx-4">Today’s Hightlights </h3>
-          <div class="grid grid-cols-2 gap-14 mx-4">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 mx-4">
             <div class="hightlights-card">
               <h4 class="my-2">Wind status</h4>
-              <div class="flex my-2 text-7xl">
+              <div class="flex my-2 text-2xl md:text-3xl lg:text-7xl">
                 {{ windSpeed }}
-                <div class="text-4xl mt-5">mph</div>
+                <div class="text-xl md:text-4xl mt-5">mph</div>
               </div>
               <div class="flex justify-center items-center mt-5">
                 <i class="wind-icon mx-2 fill-current">
-                  <svg class="w-6" :class="windDirectionClass" aria-hidden="true" data-icon="location-arrow" data-prefix="fas" focusable="false" role="img" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                    <path d="m216.42 35.951-151.94 405.86c-17.364 46.994 40.23 83.679 74.651 49.616l118.33-117.1 117.1 118.33c34.063 34.421 92.043-1.6537 75.165-48.833l-147.69-407.43c-14.799-36.468-70.448-36.759-85.615-0.44742z" fill="currentColor" stroke-width=".94638"/>
+                  <svg class="w-6" :class="windDirectionClass" aria-hidden="true" data-icon="location-arrow"
+                       data-prefix="fas" focusable="false" role="img" version="1.1" viewBox="0 0 512 512"
+                       xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="m216.42 35.951-151.94 405.86c-17.364 46.994 40.23 83.679 74.651 49.616l118.33-117.1 117.1 118.33c34.063 34.421 92.043-1.6537 75.165-48.833l-147.69-407.43c-14.799-36.468-70.448-36.759-85.615-0.44742z"
+                        fill="currentColor" stroke-width=".94638"/>
                   </svg>
 
                 </i>
@@ -44,9 +50,9 @@
             </div>
             <div class="hightlights-card">
               <h4 class="my-2">Humidity</h4>
-              <div class="flex my-2 text-7xl">
+              <div class="flex my-2 text-2xl md:text-3xl lg:text-7xl">
                 {{ humidity }}
-                <div class="text-4xl mt-5">%</div>
+                <div class="text-xl md:text-4xl mt-5">%</div>
               </div>
               <div class="flex justify-center items-center w-full">
                 <div class="relative pt-1 w-full">
@@ -81,26 +87,28 @@
             </div>
             <div class="hightlights-card">
               <h4 class="my-2">Visibility</h4>
-              <div class="flex my-2 text-7xl">
+              <div class="flex my-2 text-2xl md:text-3xl lg:text-7xl">
                 {{ visibility }}
-                <div class="text-4xl mt-5">miles</div>
+                <div class="text-xl md:text-4xl mt-5">miles</div>
               </div>
             </div>
             <div class="hightlights-card">
               <h4 class="my-2">Air Pressure</h4>
-              <div class="flex my-2 text-7xl">
-                {{Math.round(airPressure)}}
-                <div class="text-4xl mt-5">mb</div>
+              <div class="flex my-2 text-2xl md:text-3xl lg:text-7xl">
+                {{ Math.round(airPressure) }}
+                <div class="text-xl md:text-4xl mt-5">mb</div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="absolute bottom-0 text-tertiary my-2">
-        created by <a class="text-green-300 hover:scale-75" href="https://www.blastkode.com">yacosta738</a> -
-        devChallenges.io
-      </div>
     </div>
+    <footer class="lg:absolute lg:bottom-0 w-full">
+      <div class="flex justify-center items-center text-tertiary my-2">
+        created by
+        <a class="text-green-300 hover:scale-75 mx-2" href="https://www.blastkode.com">yacosta738</a> - devChallenges.io
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -115,54 +123,68 @@ import {format} from "date-fns";
 @Options({})
 export default class WeatherGeneralPanel extends Vue {
 
-  weatherDate(applicableDate: string | Date){
-    const date = applicableDate? new Date(applicableDate): new Date();
-    return isTomorrow(date)? 'Tomorrow' : format(date, 'E, d MMM');
+  weatherDate(applicableDate: string | Date) {
+    const date = applicableDate ? new Date(applicableDate) : new Date();
+    return isTomorrow(date) ? 'Tomorrow' : format(date, 'E, d MMM');
   }
-  get todayWeather(){
+
+  get todayWeather() {
     return this.$store.getters.weatherToday;
   }
-  get humidity(){return this.todayWeather?.humidity}
-  get visibility(){return this.todayWeather?.visibility?.toFixed(1)?.replace('.', ',')}
-  get airPressure(){return this.todayWeather?.air_pressure}
-  get windSpeed(){
-    return this.todayWeather && this.todayWeather?.wind_speed? Math.round(this.todayWeather.wind_speed): 0
+
+  get humidity() {
+    return this.todayWeather?.humidity
   }
-  get windDirection(){
-    return this.todayWeather?.wind_direction_compass? this.todayWeather.wind_direction_compass: 'W';
+
+  get visibility() {
+    return this.todayWeather?.visibility?.toFixed(1)?.replace('.', ',')
   }
-  get windDirectionClass(): string{
-    if(this.isInRange(this.todayWeather?.wind_direction, 0, 10)){
+
+  get airPressure() {
+    return this.todayWeather?.air_pressure
+  }
+
+  get windSpeed() {
+    return this.todayWeather && this.todayWeather?.wind_speed ? Math.round(this.todayWeather.wind_speed) : 0
+  }
+
+  get windDirection() {
+    return this.todayWeather?.wind_direction_compass ? this.todayWeather.wind_direction_compass : 'W';
+  }
+
+  get windDirectionClass(): string {
+    if (this.isInRange(this.todayWeather?.wind_direction, 0, 10)) {
       return 'transform rotate-0';
-    }else  if(this.isInRange(this.todayWeather?.wind_direction, 10, 45)
-      || this.isInRange(this.todayWeather?.wind_direction, 45, 70)){
+    } else if (this.isInRange(this.todayWeather?.wind_direction, 10, 45)
+        || this.isInRange(this.todayWeather?.wind_direction, 45, 70)) {
       return 'transform rotate-45';
-    }else if(this.isInRange(this.todayWeather?.wind_direction, 70, 90)
-      || this.isInRange(this.todayWeather?.wind_direction, 90, 100)){
+    } else if (this.isInRange(this.todayWeather?.wind_direction, 70, 90)
+        || this.isInRange(this.todayWeather?.wind_direction, 90, 100)) {
       return 'transform rotate-90';
-    }else if(this.isInRange(this.todayWeather?.wind_direction, 100, 135)
-      || this.isInRange(this.todayWeather?.wind_direction, 135, 170)){
+    } else if (this.isInRange(this.todayWeather?.wind_direction, 100, 135)
+        || this.isInRange(this.todayWeather?.wind_direction, 135, 170)) {
       return 'transform rotate-135';
-    }else if(this.isInRange(this.todayWeather?.wind_direction, 170, 180)
-      || this.isInRange(this.todayWeather?.wind_direction, 180, 190)){
+    } else if (this.isInRange(this.todayWeather?.wind_direction, 170, 180)
+        || this.isInRange(this.todayWeather?.wind_direction, 180, 190)) {
       return 'transform rotate-180';
-    }else if(this.isInRange(this.todayWeather?.wind_direction, 190, 225)
-      || this.isInRange(this.todayWeather?.wind_direction, 225, 250)){
+    } else if (this.isInRange(this.todayWeather?.wind_direction, 190, 225)
+        || this.isInRange(this.todayWeather?.wind_direction, 225, 250)) {
       return 'transform rotate-225';
-    }else if(this.isInRange(this.todayWeather?.wind_direction, 250, 270)
-      || this.isInRange(this.todayWeather?.wind_direction, 270, 280)){
+    } else if (this.isInRange(this.todayWeather?.wind_direction, 250, 270)
+        || this.isInRange(this.todayWeather?.wind_direction, 270, 280)) {
       return 'transform rotate-270';
-    }else if(this.isInRange(this.todayWeather?.wind_direction, 280, 315)
-      || this.isInRange(this.todayWeather?.wind_direction, 315, 340)){
+    } else if (this.isInRange(this.todayWeather?.wind_direction, 280, 315)
+        || this.isInRange(this.todayWeather?.wind_direction, 315, 340)) {
       return 'transform rotate-315';
-    }else if(this.isInRange(this.todayWeather?.wind_direction, 340, 360)){
+    } else if (this.isInRange(this.todayWeather?.wind_direction, 340, 360)) {
       return 'transform rotate-0'
-    }
-    else return 'transform rotate-0';
+    } else return 'transform rotate-0';
   }
-  private isInRange(value: number, minValue:number, maxValue:number): boolean{
+
+  private isInRange(value: number, minValue: number, maxValue: number): boolean {
     return minValue <= value && value < maxValue;
   }
+
   get celsius() {
     return this.$store.getters.celsius;
   }
@@ -184,13 +206,13 @@ export default class WeatherGeneralPanel extends Vue {
   }
 
   weatherImage(weather): string {
-  return   weatherStateImage(weather);
+    return weatherStateImage(weather);
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.active-grade {
+.active-degree {
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   @apply mx-4 mt-8 p-2 rounded-full cursor-pointer bg-tertiary text-primary;
 }
@@ -201,7 +223,7 @@ export default class WeatherGeneralPanel extends Vue {
 }
 
 .weather-day-card {
-  @apply bg-secondary text-tertiary w-1/3 p-2 m-4;
+  @apply bg-secondary text-tertiary p-2 m-1 xl:m-4;
   .day {
     font-family: Raleway;
     font-style: normal;
@@ -210,9 +232,11 @@ export default class WeatherGeneralPanel extends Vue {
     line-height: 19px;
     @apply text-center my-4;
   }
-.image-wrapper{
-  @apply flex justify-center items-center h-20;
-}
+
+  .image-wrapper {
+    @apply flex justify-center items-center  xl:h-20;
+  }
+
   .morning {
     font-family: Raleway;
     font-style: normal;
