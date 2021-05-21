@@ -202,7 +202,7 @@ export default class WeatherGeneralPanel extends Vue {
   }
 
   get consolidatedWeather(): Weather[] {
-    return this.$store.getters.weatherData?.consolidated_weather?.filter(weather => !isToday(new Date(weather.applicable_date)));
+    return this.$store.getters.weatherData?.consolidated_weather?.filter((weather: Weather, index: number) => index>0);
   }
   get weather(): WeatherData {
     return this.$store.getters.weatherData;
@@ -212,7 +212,7 @@ export default class WeatherGeneralPanel extends Vue {
     return Math.round(this.$store.getters.celsius ? temp : celsiusToFahrenheit(temp));
   }
 
-  weatherImage(weather): string {
+  weatherImage(weather: Weather): string {
     return weatherStateImage(weather);
   }
 }

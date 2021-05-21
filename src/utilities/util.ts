@@ -41,6 +41,10 @@ export const celsiusToFahrenheit = (value: number): number =>
 
 export const isToday = (date: Date) => {
   const today = new Date();
+  console.log('today');
+  console.log(today);
+  console.log('date');
+  console.log(date);
   return (
     date.getDate() === today.getDate() &&
     date.getMonth() === today.getMonth() &&
