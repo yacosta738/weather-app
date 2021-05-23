@@ -3,7 +3,6 @@ import axios from "axios";
 import { PlaceLocation } from "../models/location.model";
 import { WeatherData } from "../models/weather-data.model";
 import { Weather } from "../models/weather.model";
-import {isToday} from "../utilities/util";
 
 const cors_proxy = "https://intense-hollows-87072.herokuapp.com/";
 

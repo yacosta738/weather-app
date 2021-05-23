@@ -15,8 +15,8 @@
                                 class="m-1 xl:m-4"
                                 v-for="i in 5" :key="i"></card-skeleton-loader>
           <div v-if="consolidatedWeather && consolidatedWeather.length > 0" class="weather-day-card"
-               v-for="weather in consolidatedWeather" :key="weather.id">
-            <h4 class="day">{{ weatherDate(weather.applicable_date) }}</h4>
+               v-for="(weather, index) in consolidatedWeather" :key="weather.id">
+            <h4 class="day">{{ weatherDate(weather.applicable_date, index) }}</h4>
             <div class="image-wrapper">
               <img :src="weatherImage(weather)" :alt="weather.weather_state_name"
                    class="object-cover p-2 w-1/2">
@@ -132,9 +132,9 @@ import CardSkeletonLoader from "./CardSkeletonLoader.vue";
 })
 export default class WeatherGeneralPanel extends Vue {
 
-  weatherDate(applicableDate: string | Date) {
+  weatherDate(applicableDate: string | Date, index: number) {
     const date = applicableDate ? new Date(applicableDate) : new Date();
-    return isTomorrow(date) ? 'Tomorrow' : format(date, 'E, d MMM');
+    return isTomorrow(date) || index === 0? 'Tomorrow' : format(date, 'E, d MMM');
   }
 
   get todayWeather() {
@@ -203,7 +203,7 @@ export default class WeatherGeneralPanel extends Vue {
   }
 
   get consolidatedWeather(): Weather[] {
-    return this.$store.getters.weatherData?.consolidated_weather?.filter((weather: Weather) => !isToday(new Date(weather.applicable_date)));
+    return this.$store.getters.weatherData?.consolidated_weather?.filter((weather: Weather, index: number) => index > 0);
   }
 
   get weather(): WeatherData {
