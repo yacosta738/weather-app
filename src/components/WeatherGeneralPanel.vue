@@ -123,7 +123,7 @@ import {Options, Vue} from 'vue-class-component';
 import {WeatherData} from "../models/weather-data.model";
 import {Weather} from "../models/weather.model";
 
-import {celsiusToFahrenheit, isToday, isTomorrow, weatherStateImage} from "../utilities/util";
+import {celsiusToFahrenheit, isTomorrow, weatherStateImage} from "../utilities/util";
 import {format} from "date-fns";
 import CardSkeletonLoader from "./CardSkeletonLoader.vue";
 
@@ -133,8 +133,12 @@ import CardSkeletonLoader from "./CardSkeletonLoader.vue";
 export default class WeatherGeneralPanel extends Vue {
 
   weatherDate(applicableDate: string | Date, index: number) {
-    const date = applicableDate ? new Date(applicableDate) : new Date();
-    return isTomorrow(date) || index === 0? 'Tomorrow' : format(date, 'E, d MMM');
+    const date: Date = applicableDate ?
+        typeof applicableDate === 'string' ?
+            new Date(Date.parse(applicableDate))
+            : applicableDate
+        : new Date();
+    return isTomorrow(date) || index === 0 ? 'Tomorrow' : format(date, 'E, d MMM');
   }
 
   get todayWeather() {
