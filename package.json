@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@types/date-fns": "^2.6.0",
-    "@vitejs/plugin-vue": "^1.1.5",
+    "@vitejs/plugin-vue": "^6.0.0",
     "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.5",
     "autoprefixer": "^10.2.5",
