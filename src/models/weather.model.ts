@@ -65,24 +65,31 @@ export class Weather implements IWeather {
     if (!json) {
       return new Weather(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "", "", 0, 0, 0, 0, 0, "", 0);
     }
-    const weatherMain = json.weather?.[0] || {};
+    // Support both Current Weather and Forecast API formats
+    // In both, main data is nested under json.main
+    const main = json.main || {};
+    const weatherInfo = json.weather?.[0] || {};
+    const wind = json.wind || {};
+    const sys = json.sys || {};
+
+    // For forecast items, temp min/max are in main; for current, same
     return new Weather(
       json.dt || 0,
-      json.temp || 0,
-      json.feels_like || 0,
-      json.temp?.min || json.temp_min || 0,
-      json.temp?.max || json.temp_max || 0,
-      json.humidity || 0,
-      json.pressure || 0,
+      main.temp || json.temp || 0,
+      main.feels_like || json.feels_like || 0,
+      main.temp_min || json.temp_min || 0,
+      main.temp_max || json.temp_max || 0,
+      main.humidity || json.humidity || 0,
+      main.pressure || json.pressure || 0,
       json.visibility || 0,
-      json.wind?.speed || json.wind_speed || 0,
-      json.wind?.deg || json.wind_deg || 0,
-      weatherMain.id?.toString() || "",
-      weatherMain.main || "",
+      wind.speed || json.wind_speed || 0,
+      wind.deg || json.wind_deg || 0,
+      weatherInfo.id?.toString() || "",
+      weatherInfo.main || "",
       json.pop || 0,
-      json.clouds || 0,
-      json.sunrise || 0,
-      json.sunset || 0,
+      json.clouds?.all || json.clouds || 0,
+      sys.sunrise || json.sunrise || 0,
+      sys.sunset || json.sunset || 0,
       json.timezone || 0,
       json.timezone_name || "",
       json.id || 0

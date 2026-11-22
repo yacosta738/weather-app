@@ -10,7 +10,7 @@ import Snow from "../assets/Snow.png";
 import Thunderstorm from "../assets/Thunderstorm.png";
 import { Weather } from "../models/weather.model";
 
-// WMO weather codes from OpenWeatherMap
+// OpenWeatherMap weather condition codes
 // https://openweathermap.org/weather-conditions
 export const weatherStateImage = (weather: Weather): string => {
   const code = weather?.weather_state_abbr;
@@ -18,45 +18,42 @@ export const weatherStateImage = (weather: Weather): string => {
 
   const numCode = parseInt(code, 10);
 
-  // 0: Clear sky
-  if (numCode === 0) return Clear;
+  // 2xx: Thunderstorm
+  if (numCode >= 200 && numCode < 300) {
+    if (numCode >= 220) return Hail; // thunderstorm with hail
+    return Thunderstorm;
+  }
 
-  // 1, 2, 3: Mainly clear, partly cloudy, and overcast
-  if (numCode >= 1 && numCode <= 3) {
-    if (numCode === 1) return Clear;
-    if (numCode === 2) return LightCloud;
+  // 3xx: Drizzle
+  if (numCode >= 300 && numCode < 400) return LightRain;
+
+  // 5xx: Rain
+  if (numCode >= 500 && numCode < 600) {
+    if (numCode === 511) return Sleet; // freezing rain
+    if (numCode >= 502) return HeavyRain; // heavy/extreme rain
+    return Shower;
+  }
+
+  // 6xx: Snow
+  if (numCode >= 600 && numCode < 700) {
+    if (numCode >= 620) return Sleet; // rain and snow mix
+    return Snow;
+  }
+
+  // 7xx: Atmosphere (fog, sand, dust, etc.)
+  if (numCode >= 700 && numCode < 800) return HeavyCloud;
+
+  // 800: Clear sky
+  if (numCode === 800) return Clear;
+
+  // 801: Few clouds
+  if (numCode === 801) return LightCloud;
+
+  // 802, 803, 804: Clouds
+  if (numCode >= 802 && numCode <= 804) {
+    if (numCode <= 803) return LightCloud;
     return HeavyCloud;
   }
-
-  // 45, 48: Fog and depositing rime fog
-  if (numCode === 45 || numCode === 48) return HeavyCloud;
-
-  // 51, 53, 55: Drizzle
-  if (numCode >= 51 && numCode <= 57) return LightRain;
-
-  // 61, 63, 65: Rain
-  if (numCode >= 61 && numCode <= 67) {
-    if (numCode <= 63) return LightRain;
-    return HeavyRain;
-  }
-
-  // 66, 67: Freezing Rain
-  if (numCode === 66 || numCode === 67) return Sleet;
-
-  // 71, 73, 75: Snow fall
-  if (numCode >= 71 && numCode <= 77) return Snow;
-
-  // 77, 80, 81, 82: Rain showers
-  if (numCode >= 80 && numCode <= 82) return Shower;
-
-  // 85, 86: Snowfall showers
-  if (numCode === 85 || numCode === 86) return Snow;
-
-  // 95: Thunderstorm
-  if (numCode === 95) return Thunderstorm;
-
-  // 96, 99: Thunderstorm with hail
-  if (numCode >= 96 && numCode <= 99) return Hail;
 
   // Fallback based on weather state name
   const name = (weather?.weather_state_name || "").toLowerCase();

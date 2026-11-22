@@ -7,13 +7,18 @@ import { Weather } from "../models/weather.model";
 const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY || "YOUR_API_KEY_HERE";
 
 const geocodingApi = axios.create({
-  baseURL: "https://geocoding-api.openweathermap.org",
+  baseURL: "https://api.openweathermap.org/geo/1.0",
   params: { appid: apiKey },
 });
 
-const weatherApi = axios.create({
-  baseURL: "https://api.openweathermap.org/data/3.0",
-  params: { appid: apiKey },
+const currentWeatherApi = axios.create({
+  baseURL: "https://api.openweathermap.org/data/2.5/weather",
+  params: { appid: apiKey, units: "metric" },
+});
+
+const forecastApi = axios.create({
+  baseURL: "https://api.openweathermap.org/data/2.5/forecast",
+  params: { appid: apiKey, units: "metric" },
 });
 
 const getLastSearch = (): string[] => {
@@ -81,7 +86,7 @@ export default createStore({
     getDataByLocation(context: any, location: string) {
       context.commit("updateLoadingLocation", true);
       geocodingApi
-        .get("/geocode/1.0", {
+        .get("/direct", {
           params: { q: location, limit: 1 },
         })
         .then((response) => {
@@ -109,82 +114,33 @@ export default createStore({
         });
     },
     getWeatherByCoords(context: any, coords: { lat: number; lon: number }) {
-      // Fetch current weather
-      weatherApi
-        .get("/onecall", {
-          params: {
-            lat: coords.lat,
-            lon: coords.lon,
-            units: "metric",
-          },
-        })
-        .then((response) => {
-          console.log("WEATHER DATA", response.data);
-          const data = response.data;
-
-          // Build daily forecast from One Call data
-          const dailyForecast: Weather[] = (data.daily || []).map((day: any) =>
-            Weather.fromJSON(day)
-          );
-
-          // Get location name from current weather response
-          const currentData = data.current;
-          const locationName = data.name || context.getters.location.name || "Unknown";
-
-          const location = new PlaceLocation(
-            locationName,
-            coords.lat,
-            coords.lon,
-            data.timezone || ""
-          );
-
-          const weatherData = WeatherData.fromCurrentAndForecast(
-            { ...currentData, timezone: data.timezone, timezone_name: data.timezone },
-            dailyForecast,
-            location
-          );
-
-          context.commit("updateLocation", location);
-          context.commit("updateWeatherData", weatherData);
-        })
-        .catch((error) => {
-          console.error("Error fetching weather:", error);
-          // Fallback: try current weather API if onecall fails
-          this.fetchWeatherFallback(coords);
-        });
-    },
-    fetchWeatherFallback(context: any, coords: { lat: number; lon: number }) {
-      // Fallback to current weather + 5-day forecast APIs
+      // Fetch current weather and 5-day forecast in parallel
       Promise.all([
-        axios.get("https://api.openweathermap.org/data/2.5/weather", {
-          params: {
-            lat: coords.lat,
-            lon: coords.lon,
-            units: "metric",
-            appid: apiKey,
-          },
+        currentWeatherApi.get("/", {
+          params: { lat: coords.lat, lon: coords.lon },
         }),
-        axios.get("https://api.openweathermap.org/data/2.5/forecast", {
-          params: {
-            lat: coords.lat,
-            lon: coords.lon,
-            units: "metric",
-            appid: apiKey,
-          },
+        forecastApi.get("/", {
+          params: { lat: coords.lat, lon: coords.lon },
         }),
       ])
         .then(([currentRes, forecastRes]) => {
+          console.log("WEATHER DATA", currentRes.data);
           const current = currentRes.data;
           const forecastList = forecastRes.data.list;
 
-          // Group forecast by day (take one entry per day at noon)
+          // Group forecast by day (take entry closest to noon for each day)
           const dailyMap = new Map<string, any>();
           forecastList.forEach((item: any) => {
             const date = item.dt_txt.split(" ")[0];
-            if (!dailyMap.has(date)) {
+            const time = item.dt_txt.split(" ")[1];
+            if (!dailyMap.has(date) || time === "12:00:00") {
               dailyMap.set(date, item);
             }
           });
+          // Remove today's forecast to avoid duplication with current weather
+          const today = new Date().toISOString().split("T")[0];
+          dailyMap.delete(today);
+
           const dailyForecast: Weather[] = Array.from(dailyMap.values()).map(
             (day: any) => Weather.fromJSON(day)
           );
@@ -193,6 +149,7 @@ export default createStore({
             current.name,
             coords.lat,
             coords.lon,
+            current.sys?.country || "",
             current.sys?.country || ""
           );
 
@@ -204,10 +161,9 @@ export default createStore({
 
           context.commit("updateLocation", location);
           context.commit("updateWeatherData", weatherData);
-          context.commit("updateLoadingLocation", false);
         })
         .catch((error) => {
-          console.error("Fallback weather fetch failed:", error);
+          console.error("Error fetching weather:", error);
           context.commit("updateLoadingLocation", false);
         });
     },
