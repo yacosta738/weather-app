@@ -15,15 +15,15 @@
                                 class="m-1 xl:m-4"
                                 v-for="i in 5" :key="i"></card-skeleton-loader>
           <div v-if="consolidatedWeather && consolidatedWeather.length > 0" class="weather-day-card"
-               v-for="(weather, index) in consolidatedWeather" :key="weather.id">
-            <h4 class="day">{{ weatherDate(weather.applicable_date, index) }}</h4>
+               v-for="(weather, index) in consolidatedWeather" :key="index">
+            <h4 class="day">{{ weatherDate(weather.dt, index) }}</h4>
             <div class="image-wrapper">
               <img :src="weatherImage(weather)" :alt="weather.weather_state_name"
                    class="object-cover p-2 w-1/2">
             </div>
             <div class="flex justify-around my-4 mx-2">
-              <span class="morning">{{ temperature(weather.max_temp) }}ªC</span>
-              <span class="evening">{{ temperature(weather.min_temp) }}ªC</span>
+              <span class="morning">{{ temperature(weather.temp_max) }}{{ $store.getters.gradeLabel }}</span>
+              <span class="evening">{{ temperature(weather.temp_min) }}{{ $store.getters.gradeLabel }}</span>
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@ import {Options, Vue} from 'vue-class-component';
 import {WeatherData} from "../models/weather-data.model";
 import {Weather} from "../models/weather.model";
 
-import {celsiusToFahrenheit, isTomorrow, weatherStateImage} from "../utilities/util";
+import {celsiusToFahrenheit, isTomorrow, weatherStateImage, getWindDirectionCompass} from "../utilities/util";
 import {format} from "date-fns";
 import CardSkeletonLoader from "./CardSkeletonLoader.vue";
 
@@ -132,13 +132,9 @@ import CardSkeletonLoader from "./CardSkeletonLoader.vue";
 })
 export default class WeatherGeneralPanel extends Vue {
 
-  weatherDate(applicableDate: string | Date, index: number) {
-    const date: Date = applicableDate ?
-        typeof applicableDate === 'string' ?
-            new Date(Date.parse(applicableDate))
-            : applicableDate
-        : new Date();
-    return isTomorrow(date) || index === 0 ? 'Tomorrow' : format(date, 'E, d MMM');
+  weatherDate(dt: number, index: number) {
+    const date = dt ? new Date(dt * 1000) : new Date();
+    return index === 0 ? 'Today' : (isTomorrow(date) ? 'Tomorrow' : format(date, 'E, d MMM'));
   }
 
   get todayWeather() {
@@ -146,52 +142,51 @@ export default class WeatherGeneralPanel extends Vue {
   }
 
   get humidity() {
-    return this.todayWeather?.humidity
+    return this.todayWeather?.humidity ?? 0;
   }
 
   get visibility() {
-    return this.todayWeather?.visibility?.toFixed(1)?.replace('.', ',')
+    // OpenWeatherMap returns visibility in meters, convert to miles
+    const visMeters = this.todayWeather?.visibility ?? 0;
+    const miles = visMeters > 0 ? (visMeters / 1609.34).toFixed(1).replace('.', ',') : '0';
+    return miles;
   }
 
   get airPressure() {
-    return this.todayWeather?.air_pressure
+    return this.todayWeather?.pressure ?? 0;
   }
 
   get windSpeed() {
-    return this.todayWeather && this.todayWeather?.wind_speed ? Math.round(this.todayWeather.wind_speed) : 0
+    // OpenWeatherMap returns m/s, convert to mph
+    const ms = this.todayWeather?.wind_speed ?? 0;
+    return Math.round(ms * 2.237);
   }
 
   get windDirection() {
-    return this.todayWeather?.wind_direction_compass ? this.todayWeather.wind_direction_compass : 'W';
+    const deg = this.todayWeather?.wind_deg ?? 0;
+    return getWindDirectionCompass(deg);
   }
 
   get windDirectionClass(): string {
-    if (this.isInRange(this.todayWeather?.wind_direction, 0, 10)) {
+    const deg = this.todayWeather?.wind_deg ?? 0;
+    if (this.isInRange(deg, 340, 360) || this.isInRange(deg, 0, 20)) {
       return 'transform rotate-0';
-    } else if (this.isInRange(this.todayWeather?.wind_direction, 10, 45)
-        || this.isInRange(this.todayWeather?.wind_direction, 45, 70)) {
+    } else if (this.isInRange(deg, 20, 65)) {
       return 'transform rotate-45';
-    } else if (this.isInRange(this.todayWeather?.wind_direction, 70, 90)
-        || this.isInRange(this.todayWeather?.wind_direction, 90, 100)) {
+    } else if (this.isInRange(deg, 65, 110)) {
       return 'transform rotate-90';
-    } else if (this.isInRange(this.todayWeather?.wind_direction, 100, 135)
-        || this.isInRange(this.todayWeather?.wind_direction, 135, 170)) {
+    } else if (this.isInRange(deg, 110, 155)) {
       return 'transform rotate-135';
-    } else if (this.isInRange(this.todayWeather?.wind_direction, 170, 180)
-        || this.isInRange(this.todayWeather?.wind_direction, 180, 190)) {
+    } else if (this.isInRange(deg, 155, 200)) {
       return 'transform rotate-180';
-    } else if (this.isInRange(this.todayWeather?.wind_direction, 190, 225)
-        || this.isInRange(this.todayWeather?.wind_direction, 225, 250)) {
+    } else if (this.isInRange(deg, 200, 245)) {
       return 'transform rotate-225';
-    } else if (this.isInRange(this.todayWeather?.wind_direction, 250, 270)
-        || this.isInRange(this.todayWeather?.wind_direction, 270, 280)) {
+    } else if (this.isInRange(deg, 245, 290)) {
       return 'transform rotate-270';
-    } else if (this.isInRange(this.todayWeather?.wind_direction, 280, 315)
-        || this.isInRange(this.todayWeather?.wind_direction, 315, 340)) {
+    } else if (this.isInRange(deg, 290, 340)) {
       return 'transform rotate-315';
-    } else if (this.isInRange(this.todayWeather?.wind_direction, 340, 360)) {
-      return 'transform rotate-0'
-    } else return 'transform rotate-0';
+    }
+    return 'transform rotate-0';
   }
 
   private isInRange(value: number, minValue: number, maxValue: number): boolean {
@@ -207,7 +202,7 @@ export default class WeatherGeneralPanel extends Vue {
   }
 
   get consolidatedWeather(): Weather[] {
-    return this.$store.getters.weatherData?.consolidated_weather?.filter((weather: Weather, index: number) => index > 0);
+    return this.$store.getters.weatherData?.daily || [];
   }
 
   get weather(): WeatherData {

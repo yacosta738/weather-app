@@ -1,37 +1,35 @@
 import { Weather } from "./weather.model";
 import { PlaceLocation } from "./location.model";
-import { WeatherSource } from "./weather-sources";
 
 export interface IWeatherData {
-  consolidated_weather: Weather[];
-  latt_long: string;
-  location_type: string;
-  parent: PlaceLocation;
-  sources: WeatherSource[];
-  sun_rise: string | Date;
-  sun_set: string | Date;
-  time: string | Date;
+  daily: Weather[]; // daily forecast (up to 8 days)
+  current: Weather; // current weather
+  location: PlaceLocation;
   timezone: string;
   timezone_name: string;
   title: string;
-  woeid: number;
 }
 
 export class WeatherData implements IWeatherData {
   constructor(
-    public consolidated_weather: Weather[],
-    public latt_long: string,
-    public location_type: string,
-    public parent: PlaceLocation,
-    public sources: WeatherSource[],
-    public sun_rise: string | Date,
-    public sun_set: string | Date,
-    public time: string | Date,
+    public daily: Weather[],
+    public current: Weather,
+    public location: PlaceLocation,
     public timezone: string,
     public timezone_name: string,
-    public title: string,
-    public woeid: number
+    public title: string
   ) {
-    this.woeid = this.woeid || 0;
+    this.daily = this.daily || [];
+  }
+
+  static fromCurrentAndForecast(current: any, forecast: Weather[], location: PlaceLocation): WeatherData {
+    return new WeatherData(
+      forecast,
+      Weather.fromJSON(current),
+      location,
+      current?.timezone || "",
+      current?.timezone_name || "",
+      location.name
+    );
   }
 }

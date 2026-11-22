@@ -51,15 +51,15 @@ export default class WeatherLeftPanel extends Vue {
     return this.$store.getters.weatherToday;
   }
   get weatherDate(){
-    const date = this.todayWeather?.applicable_date? new Date(this.todayWeather?.applicable_date): new Date();
+    const date = this.todayWeather?.dt ? new Date(this.todayWeather.dt * 1000) : new Date();
     return format(date, 'E, d MMM');
   }
   get city() {
-    return this.$store.getters.weatherData?.title;
+    return this.$store.getters.weatherData?.title || this.$store.getters.location?.name || "";
   }
 
   get temperature() {
-    const temp = this.todayWeather?.the_temp? this.todayWeather?.the_temp: 0;
+    const temp = this.todayWeather?.temp ?? 0;
     return Math.round(this.$store.getters.celsius ? temp : celsiusToFahrenheit(temp));
   }
 
@@ -68,7 +68,7 @@ export default class WeatherLeftPanel extends Vue {
   }
 
   get weatherStateName(): string {
-    return this.todayWeather?.weather_state_name;
+    return this.todayWeather?.weather_state_name || "";
   }
 }
 </script>

@@ -1,27 +1,36 @@
-// Response Fields
-// Field	Type	Unit	Description
-// title	string		Name of the location
-// location_type	string	(City|Region / State / Province|Country|Continent)
-// latt_long	floats, comma separated
-// woeid	integer		Where On Earth ID
-// distance	integer	Metres	Only returned on a lattlong search
+// OpenWeatherMap Geocoding API response
 export interface ILocation {
-  title: string;
-  location_type: string;
-  latt_long: string;
-  woeid: number;
-  distance?: number;
+  name: string;
+  local_names?: Record<string, string>;
+  lat: number;
+  lon: number;
+  country: string;
+  state?: string;
 }
 
 export class PlaceLocation implements ILocation {
   constructor(
-    public title: string,
-    public location_type: string,
-    public latt_long: string,
-    public woeid: number,
-    public distance?: number
+    public name: string,
+    public lat: number,
+    public lon: number,
+    public country: string,
+    public state?: string,
+    public local_names?: Record<string, string>
   ) {
-    this.woeid = this.woeid || 0;
-    this.distance = this.distance || 0;
+    this.lat = this.lat || 0;
+    this.lon = this.lon || 0;
+  }
+
+  static fromJSON(json: any): PlaceLocation {
+    return json
+      ? new PlaceLocation(
+          json.name,
+          json.lat,
+          json.lon,
+          json.country,
+          json.state,
+          json.local_names
+        )
+      : new PlaceLocation("", 0, 0, "");
   }
 }

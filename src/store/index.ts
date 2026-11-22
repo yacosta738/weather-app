@@ -4,11 +4,18 @@ import { PlaceLocation } from "../models/location.model";
 import { WeatherData } from "../models/weather-data.model";
 import { Weather } from "../models/weather.model";
 
-const cors_proxy = "https://intense-hollows-87072.herokuapp.com/";
+const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY || "YOUR_API_KEY_HERE";
 
-const api = axios.create({
-  baseURL: `${cors_proxy}https://www.metaweather.com/api/location`,
+const geocodingApi = axios.create({
+  baseURL: "https://geocoding-api.openweathermap.org",
+  params: { appid: apiKey },
 });
+
+const weatherApi = axios.create({
+  baseURL: "https://api.openweathermap.org/data/3.0",
+  params: { appid: apiKey },
+});
+
 const getLastSearch = (): string[] => {
   if (!localStorage.getItem("localSearch")) {
     localStorage.setItem("localSearch", JSON.stringify([]));
@@ -16,132 +23,215 @@ const getLastSearch = (): string[] => {
   const lSearch: string | null = localStorage.getItem("localSearch");
   return lSearch ? JSON.parse(lSearch) : [];
 };
+
+// Empty weather data for initialization
+const emptyWeather = new Weather(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "", "", 0, 0, 0, 0, 0, "", 0);
+const emptyLocation = new PlaceLocation("", 0, 0, "");
+
 export default createStore({
   state: {
     drawer: false,
     loadingLocation: false,
     celsius: true,
-    location: new PlaceLocation("", "", "", 0, 0),
-    weatherData: new WeatherData(
-      [],
-      "",
-      "",
-      new PlaceLocation("", "", "", 0, 0),
-      [],
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      0
-    ),
+    location: emptyLocation,
+    weatherData: new WeatherData([], emptyWeather, emptyLocation, "", "", ""),
     lastSearch: getLastSearch(),
   },
   getters: {
-    drawer: (state) => state.drawer,
-    loadingLocation: (state) => state.loadingLocation,
-    location: (state) => state.location,
-    weatherData: (state) => state.weatherData,
-    weatherToday: (state) => state.weatherData?.consolidated_weather[0],
-    gradeLabel: (state) => (state.celsius ? "℃" : "℉"),
-    celsius: (state) => state.celsius,
-    lastSearch: (state) =>
+    drawer: (state: any) => state.drawer,
+    loadingLocation: (state: any) => state.loadingLocation,
+    location: (state: any) => state.location,
+    weatherData: (state: any) => state.weatherData,
+    weatherToday: (state: any) => state.weatherData?.current || emptyWeather,
+    consolidated_weather: (state: any) => state.weatherData?.daily || [],
+    gradeLabel: (state: any) => (state.celsius ? "℃" : "℉"),
+    celsius: (state: any) => state.celsius,
+    lastSearch: (state: any) =>
       state.lastSearch?.filter((value: string, index: number) => index <= 10),
   },
   mutations: {
-    updateDrawer(state, drawer) {
+    updateDrawer(state: any, drawer: boolean) {
       state.drawer = drawer;
     },
-    updateLoadingLocation(state, loadingLocation) {
+    updateLoadingLocation(state: any, loadingLocation: boolean) {
       state.loadingLocation = loadingLocation;
     },
-    updateCelsius(state, celsius) {
+    updateCelsius(state: any, celsius: boolean) {
       state.celsius = celsius;
     },
-    updateLocation(state, location: PlaceLocation) {
+    updateLocation(state: any, location: PlaceLocation) {
       state.location = location;
     },
-    updateWeatherData(state, weatherData: WeatherData) {
-      const consolidatedWeather: Weather[] =
-        weatherData.consolidated_weather.map((weather) =>
-          Weather.fromJSON(weather)
-        );
-      state.weatherData = new WeatherData(
-        consolidatedWeather,
-        weatherData.latt_long,
-        weatherData.location_type,
-        weatherData.parent,
-        weatherData.sources,
-        weatherData.sun_rise,
-        weatherData.sun_set,
-        weatherData.time,
-        weatherData.timezone,
-        weatherData.timezone_name,
-        weatherData.title,
-        weatherData.woeid
-      );
+    updateWeatherData(state: any, weatherData: WeatherData) {
+      state.weatherData = weatherData;
     },
-    addLastSearch(state, search: string) {
+    addLastSearch(state: any, search: string) {
       const isSearchStored = state.lastSearch.find(
-        (s) => s.toLowerCase() === search.toLowerCase()
+        (s: string) => s.toLowerCase() === search.toLowerCase()
       );
       if (isSearchStored) return;
       if (state.lastSearch.length >= 9) {
-        state.lastSearch.slice(1);
+        state.lastSearch.shift();
       }
       state.lastSearch.push(search);
       localStorage.setItem("localSearch", JSON.stringify(state.lastSearch));
     },
   },
   actions: {
-    getDataByLocation(context, location: string) {
+    getDataByLocation(context: any, location: string) {
       context.commit("updateLoadingLocation", true);
-      api
-        .get(`/search/?query=${location}`)
+      geocodingApi
+        .get("/geocode/1.0", {
+          params: { q: location, limit: 1 },
+        })
         .then((response) => {
-          console.log("S E A R C H   B Y   L O C A T I O N");
-          context.commit("updateLocation", response.data[0]);
+          console.log("SEARCH BY LOCATION", response.data);
+          if (!response.data || response.data.length === 0) {
+            console.error("No location found");
+            context.commit("updateLoadingLocation", false);
+            return;
+          }
+          const place = PlaceLocation.fromJSON(response.data[0]);
+          context.commit("updateLocation", place);
           context
-            .dispatch("getDataByWoeid", context.getters.location.woeid)
+            .dispatch("getWeatherByCoords", { lat: place.lat, lon: place.lon })
             .then(() => {
               context.commit("updateLoadingLocation", false);
               context.commit("updateDrawer", false);
+            })
+            .catch(() => {
+              context.commit("updateLoadingLocation", false);
             });
         })
-        .catch((error) => console.log(error));
-    },
-    getDataByCoord(context, lat_lon) {
-      api
-        .get<PlaceLocation[]>(`/search/?lattlong=${lat_lon}`)
-        .then((response) => {
-          context.commit("updateLocation", response.data[0]);
-          context
-            .dispatch("getDataByWoeid", context.getters.location.woeid)
-            .then();
-        })
-        .catch((error) => console.log(error));
-    },
-    getDataByWoeid(context, woeid) {
-      api
-        .get<WeatherData>(`/${woeid}`)
-        .then((response) => {
-          context.commit("updateWeatherData", response.data);
-        })
-        .catch((error) => console.log(error));
-    },
-    geolocation(context) {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          console.log("S T A R T   S E A R C H   L O C A T I O N");
-          let latt_long =
-            position.coords.latitude.toFixed(2) +
-            "," +
-            position.coords.longitude.toFixed(2);
-          context.dispatch("getDataByCoord", latt_long);
+        .catch((error) => {
+          console.error("Error searching location:", error);
+          context.commit("updateLoadingLocation", false);
         });
+    },
+    getWeatherByCoords(context: any, coords: { lat: number; lon: number }) {
+      // Fetch current weather
+      weatherApi
+        .get("/onecall", {
+          params: {
+            lat: coords.lat,
+            lon: coords.lon,
+            units: "metric",
+          },
+        })
+        .then((response) => {
+          console.log("WEATHER DATA", response.data);
+          const data = response.data;
+
+          // Build daily forecast from One Call data
+          const dailyForecast: Weather[] = (data.daily || []).map((day: any) =>
+            Weather.fromJSON(day)
+          );
+
+          // Get location name from current weather response
+          const currentData = data.current;
+          const locationName = data.name || context.getters.location.name || "Unknown";
+
+          const location = new PlaceLocation(
+            locationName,
+            coords.lat,
+            coords.lon,
+            data.timezone || ""
+          );
+
+          const weatherData = WeatherData.fromCurrentAndForecast(
+            { ...currentData, timezone: data.timezone, timezone_name: data.timezone },
+            dailyForecast,
+            location
+          );
+
+          context.commit("updateLocation", location);
+          context.commit("updateWeatherData", weatherData);
+        })
+        .catch((error) => {
+          console.error("Error fetching weather:", error);
+          // Fallback: try current weather API if onecall fails
+          this.fetchWeatherFallback(coords);
+        });
+    },
+    fetchWeatherFallback(context: any, coords: { lat: number; lon: number }) {
+      // Fallback to current weather + 5-day forecast APIs
+      Promise.all([
+        axios.get("https://api.openweathermap.org/data/2.5/weather", {
+          params: {
+            lat: coords.lat,
+            lon: coords.lon,
+            units: "metric",
+            appid: apiKey,
+          },
+        }),
+        axios.get("https://api.openweathermap.org/data/2.5/forecast", {
+          params: {
+            lat: coords.lat,
+            lon: coords.lon,
+            units: "metric",
+            appid: apiKey,
+          },
+        }),
+      ])
+        .then(([currentRes, forecastRes]) => {
+          const current = currentRes.data;
+          const forecastList = forecastRes.data.list;
+
+          // Group forecast by day (take one entry per day at noon)
+          const dailyMap = new Map<string, any>();
+          forecastList.forEach((item: any) => {
+            const date = item.dt_txt.split(" ")[0];
+            if (!dailyMap.has(date)) {
+              dailyMap.set(date, item);
+            }
+          });
+          const dailyForecast: Weather[] = Array.from(dailyMap.values()).map(
+            (day: any) => Weather.fromJSON(day)
+          );
+
+          const location = new PlaceLocation(
+            current.name,
+            coords.lat,
+            coords.lon,
+            current.sys?.country || ""
+          );
+
+          const weatherData = WeatherData.fromCurrentAndForecast(
+            current,
+            dailyForecast,
+            location
+          );
+
+          context.commit("updateLocation", location);
+          context.commit("updateWeatherData", weatherData);
+          context.commit("updateLoadingLocation", false);
+        })
+        .catch((error) => {
+          console.error("Fallback weather fetch failed:", error);
+          context.commit("updateLoadingLocation", false);
+        });
+    },
+    geolocation(context: any) {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            console.log("START SEARCH LOCATION");
+            const coords = {
+              lat: position.coords.latitude,
+              lon: position.coords.longitude,
+            };
+            context.commit("updateLoadingLocation", true);
+            context.dispatch("getWeatherByCoords", coords).then(() => {
+              context.commit("updateLoadingLocation", false);
+            });
+          },
+          (error) => {
+            console.error("Geolocation error:", error);
+            alert("Geolocation no está disponible. Busca una ciudad manualmente.");
+          }
+        );
       } else {
-        alert(" geolocation IS NOT available");
+        alert("Geolocation no está disponible en este navegador.");
       }
     },
   },

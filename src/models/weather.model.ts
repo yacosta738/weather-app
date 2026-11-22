@@ -1,85 +1,91 @@
-// air_pressure: 1020
-// applicable_date: "2021-05-17"
-// created: "2021-05-18T01:18:37.467910Z"
-// humidity: 58
-// id: 5837054417043456
-// max_temp: 27.67
-// min_temp: 23.83
-// predictability: 73
-// the_temp: 26.625
-// visibility: 12.407539966595085
-// weather_state_abbr: "s"
-// weather_state_name: "Showers"
-// wind_direction: 67.16693729906565
-// wind_direction_compass: "ENE"
-// wind_speed: 9.54615079300883
+// OpenWeatherMap One Call 3.0 / Current Weather response fields
 export interface IWeather {
-  air_pressure: number;
-  applicable_date: string;
-  created: string;
+  dt: number; // timestamp
+  temp: number;
+  feels_like: number;
+  temp_min: number;
+  temp_max: number;
   humidity: number;
-  id: number;
-  max_temp: number;
-  min_temp: number;
-  predictability: number;
-  the_temp: number;
+  pressure: number;
   visibility: number;
-  weather_state_abbr: string;
-  weather_state_name: string;
-  wind_direction: number;
-  wind_direction_compass: string;
   wind_speed: number;
+  wind_deg: number;
+  weather_state_abbr: string; // WMO code
+  weather_state_name: string;
+  pop: number; // probability of precipitation
+  clouds: number;
+  sunrise: number;
+  sunset: number;
+  timezone: number;
+  timezone_name: string;
+  id: number;
 }
 
 export class Weather implements IWeather {
   constructor(
-    public air_pressure: number,
-    public applicable_date: string,
-    public created: string,
+    public dt: number,
+    public temp: number,
+    public feels_like: number,
+    public temp_min: number,
+    public temp_max: number,
     public humidity: number,
-    public id: number,
-    public max_temp: number,
-    public min_temp: number,
-    public predictability: number,
-    public the_temp: number,
+    public pressure: number,
     public visibility: number,
+    public wind_speed: number,
+    public wind_deg: number,
     public weather_state_abbr: string,
     public weather_state_name: string,
-    public wind_direction: number,
-    public wind_direction_compass: string,
-    public wind_speed: number
+    public pop: number,
+    public clouds: number,
+    public sunrise: number,
+    public sunset: number,
+    public timezone: number,
+    public timezone_name: string,
+    public id: number
   ) {
-    this.air_pressure = this.air_pressure || 0;
+    this.dt = this.dt || 0;
+    this.temp = this.temp || 0;
+    this.feels_like = this.feels_like || 0;
+    this.temp_min = this.temp_min || 0;
+    this.temp_max = this.temp_max || 0;
     this.humidity = this.humidity || 0;
-    this.id = this.id || 0;
-    this.max_temp = this.max_temp || 0;
-    this.min_temp = this.min_temp || 0;
-    this.predictability = this.predictability || 0;
-    this.the_temp = this.the_temp || 0;
+    this.pressure = this.pressure || 0;
     this.visibility = this.visibility || 0;
-    this.wind_direction = this.wind_direction || 0;
     this.wind_speed = this.wind_speed || 0;
+    this.wind_deg = this.wind_deg || 0;
+    this.pop = this.pop || 0;
+    this.clouds = this.clouds || 0;
+    this.sunrise = this.sunrise || 0;
+    this.sunset = this.sunset || 0;
+    this.timezone = this.timezone || 0;
+    this.id = this.id || 0;
   }
 
   static fromJSON(json: any): Weather {
-    return json
-      ? new Weather(
-          json.air_pressure,
-          json.applicable_date,
-          json.created,
-          json.humidity,
-          json.id,
-          json.max_temp,
-          json.min_temp,
-          json.predictability,
-          json.the_temp,
-          json.visibility,
-          json.weather_state_abbr,
-          json.weather_state_name,
-          json.wind_direction,
-          json.wind_direction_compass,
-          json.wind_speed
-        )
-      : new Weather(0, "", "", 0, 0, 0, 0, 0, 0, 0, "", "", 0, "", 0);
+    if (!json) {
+      return new Weather(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "", "", 0, 0, 0, 0, 0, "", 0);
+    }
+    const weatherMain = json.weather?.[0] || {};
+    return new Weather(
+      json.dt || 0,
+      json.temp || 0,
+      json.feels_like || 0,
+      json.temp?.min || json.temp_min || 0,
+      json.temp?.max || json.temp_max || 0,
+      json.humidity || 0,
+      json.pressure || 0,
+      json.visibility || 0,
+      json.wind?.speed || json.wind_speed || 0,
+      json.wind?.deg || json.wind_deg || 0,
+      weatherMain.id?.toString() || "",
+      weatherMain.main || "",
+      json.pop || 0,
+      json.clouds || 0,
+      json.sunrise || 0,
+      json.sunset || 0,
+      json.timezone || 0,
+      json.timezone_name || "",
+      json.id || 0
+    );
   }
 }
